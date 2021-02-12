@@ -11,6 +11,8 @@ Usage of \xxx\xxx\syo:
   -o    overwrite existing content
   -w int
         number of workers (default 1)
+  -s string
+        which syosetu site (default is ncode)
 ```
 
 ```
@@ -18,9 +20,13 @@ Usage of \xxx\xxx\syo:
 # -w Workers: 10
 # -n Download Novels: n7104eb,n0628ew,n2933fj
 # -o Overwrite existing chapters, toc, etc...
+# -s Syosetu site: ncode/yomou/novel18/etc.
 
-
+--will search on https://ncode.syosetu.com
 ./syo -l 1s -w 10 -o -n n7104eb,n0628ew,n2933fj
+
+--will search on https://novel18.syosetu.com
+./syo -l 1s -w 10 -o -s novel18 -n n8641dj
 ```
 
 Running the above will end up looking something like this for each web novel. the source file contains a link back to the novel url. toc contains a table of contents of the novel chapters and the rest should be self explanatory.

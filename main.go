@@ -15,21 +15,26 @@ import (
 )
 
 var (
-	SyosetuURL = "https://ncode.syosetu.com"
+	StrHttp    = "https://"
+	SyosetuURL = ".syosetu.com"
 	MaxWorkers = flag.Int("w", 1, "number of workers")
 	Ids        = flag.String("n", "", "ids of novels")
 	Overwrite  = flag.Bool("o", false, "overwrite existing content")
 	Limit      = flag.Duration("l", 200*time.Millisecond, "limit requests to syosetu")
+	SyoType    = flag.String("s", "ncode", "which syosetu site")
 )
 
 // DownloadPage ...
 func DownloadPage(id string) {
 	log.Printf("Downloading: %s\n", id)
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", SyosetuURL+id, nil)
+	req, err := http.NewRequest("GET", StrHttp+*SyoType+SyosetuURL+id, nil)
 	if err != nil {
 		log.Println(err)
 	}
+	
+	req.AddCookie(&http.Cookie{Name: "over18", Value: "yes", Domain: ".syosetu.com"})
+	
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
@@ -59,12 +64,15 @@ type PageLink struct {
 
 // Download ...
 func Download(id string, jobs chan Job, wg *sync.WaitGroup) {
-	url := SyosetuURL + "/" + id
+	url := StrHttp+*SyoType+SyosetuURL + "/" + id
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Println(err)
 	}
+	
+	req.AddCookie(&http.Cookie{Name: "over18", Value: "yes", Domain: ".syosetu.com"})
+	
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
@@ -101,7 +109,7 @@ func Download(id string, jobs chan Job, wg *sync.WaitGroup) {
 		for _, pageLink := range pageLinks {
 			b.WriteRune('\n')
 			longUpdate := strings.Replace(pageLink.LongUpdate, "\n", "", -1)
-			pageURL := SyosetuURL + strings.Replace(pageLink.URL, "\n", "", -1)
+			pageURL := StrHttp+*SyoType+SyosetuURL + strings.Replace(pageLink.URL, "\n", "", -1)
 			title := strings.Replace(pageLink.Title, "\n", "", -1)
 			b.WriteString(longUpdate[:16])
 			b.WriteString(", ")
